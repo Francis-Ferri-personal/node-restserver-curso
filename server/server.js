@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 
 // app.get('/', function (req, res) {
 app.get('/usuario', (req, res) => {
-  res.json('get Usuario')
+  res.json('get Usuario LOCAL!')
 });
 
 app.post('/usuario', (req, res) => {
