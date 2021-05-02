@@ -3,14 +3,13 @@ const bcrypt = require('bcrypt');
 const _ = require("underscore");
 
 const Usuario  = require("../models/usuario");
-const { response } = require('express');
+const { verificarToken, verificarAdminRole } = require('../middlewares/autenticacion');
 
 const app = express();
 
 // app.get('/', function (req, res) {
-app.get('/usuario', (req, res) => {
-
-    // {estado: true}
+// El segundo argumento es el middleware que se va adisparar cuandos e quiera accesar a esta ruta
+app.get('/usuario', verificarToken ,(req, res) => {
 
     const desde = Number(req.query.desde) || 0;
     const limite = Number(req.query.limite) || 5;
@@ -38,7 +37,7 @@ app.get('/usuario', (req, res) => {
     });
 });
 
-app.post('/usuario', (req, res) => {
+app.post('/usuario', [verificarToken, verificarAdminRole], (req, res) => {
     const body = req.body;
     const usuario = new Usuario({
         nombre: body.nombre,
@@ -61,7 +60,7 @@ app.post('/usuario', (req, res) => {
     });
 });
 
-app.put('/usuario/:id', (req, res) => {
+app.put('/usuario/:id', [verificarToken, verificarAdminRole], (req, res) => {
     const id = req.params.id;
     const campos = ["nombre", "email", "img", "role", "estado"];
     let body = _.pick(req.body, campos) ;
@@ -91,7 +90,7 @@ app.put('/usuario/:id', (req, res) => {
     })
 });
 
-app.delete('/usuario/:id', (req, res) => {
+app.delete('/usuario/:id', [verificarToken, verificarAdminRole], (req, res) => {
     // En proyectos reales no elimines los registros de las bases de datoss, lo que se hace es cambiar el esstado del registro para que deje de estar disponible. Estos reguistros pueden serviur para auditoira
     let id = req.params.id;
     const cambiaEstado = { estado: false };
